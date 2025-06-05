@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kodam Gacha</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background: #1a1a1a;
+      color: #c0c0c0;
+      margin: 0;
+      padding: 40px 0;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #2d2d2d;
+      border: 3px solid #00ff00;
+      border-radius: 12px;
+      padding: 30px;
+      width: 500px;
+      box-shadow: 0 0 15px #00ff00;
+    }
+    h1 {
+      text-align: center;
+      color: #00ff00;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .result, .table {
+      margin-top: 30px;
+      padding: 20px;
+      border: 2px solid #00ff00;
+      background: #000;
+      border-radius: 8px;
+      color: #00ff00;
+    }
+    .result img {
+      max-width: 100%;
+      border: 2px solid #00ff00;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #00ff00;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #004400;
+    }
+    .logout {
+      margin-top: 24px;
+      text-align: center;
+    }
+    .logout a {
+      color: #00ff00;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .logout a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hasil Gacha Kodam</h1>
+
+    <div class="result" id="gachaResult"></div>
+
+    <div class="table">
+      <strong>Daftar Semua Pengguna yang Sudah Gacha:</strong>
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Kode</th>
+            <th>Nama Kodam</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="logout">
+      <a href="index.html" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <script>
+    const kodams = [
+      { kode: 'scp-0223', nama: 'REZA KECAP', gambar: 'rezakecap.png' },
+      { kode: 'scp-324', nama: 'PENGHUTANG HANDAL', gambar: 'penghutang.png' },
+      { kode: 'scp-43534', nama: 'WUJUD ASLI ADMIN', gambar: 'fufufafa.png' },
+      { kode: 'scp-086', nama: 'SI KEBAL 5G', gambar: 'sikebal5g.png' },
+      { kode: 'scp-234', nama: 'AMBATUKAM', gambar: 'ambatukam.png' },
+    ];
+
+    const username = localStorage.getItem("loggedInUser");
+    if (!username) {
+      window.location.href = "index.html";
+    }
+
+    const logData = JSON.parse(localStorage.getItem("gachaLog")) || {};
+
+    if (!logData[username]) {
+      const seed = parseInt(username.split('').map(c => c.charCodeAt(0)).join(''), 10) || Date.now();
+      const rng = seed % kodams.length;
+      logData[username] = kodams[rng];
+      localStorage.setItem("gachaLog", JSON.stringify(logData));
+    }
+
+    const hasil = logData[username];
+
+    const gachaDiv = document.getElementById("gachaResult");
+    gachaDiv.innerHTML = `
+      <strong>${username} mendapatkan:</strong><br><br>
+      <img src="${hasil.gambar}" alt="${hasil.nama}">
+      <div><strong>Kode:</strong> ${hasil.kode}</div>
+      <div><strong>Nama:</strong> ${hasil.nama}</div>
+    `;
+
+    const tbody = document.getElementById("userTableBody");
+    for (const user in logData) {
+      const k = logData[user];
+      const row = `<tr>
+          <td>${user}</td>
+          <td>${k.kode}</td>
+          <td>${k.nama}</td>
+        </tr>`;
+      tbody.innerHTML += row;
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+    }
+  </script>
+</body>
+</html>
